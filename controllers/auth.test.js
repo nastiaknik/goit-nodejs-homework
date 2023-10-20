@@ -146,6 +146,7 @@ describe("User Auth Controller", () => {
         password: "hashedPassword",
         verificationToken: expect.any(String),
       });
+    
       expect(sendEmail).toHaveBeenCalled();
 
       expect(res.status).toHaveBeenCalledWith(201);

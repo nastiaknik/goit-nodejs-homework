@@ -18,6 +18,7 @@ const {
   changeUserPassword,
 } = require("../../controllers/auth");
 
+
 const router = express.Router();
 
 router.post("/register", validateBody(registerSchema), register);

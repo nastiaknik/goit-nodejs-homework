@@ -1,41 +1,20 @@
-## GoIT Node.js Course Template Homework
+# REST API for Contact Collection
 
-<<<<<<< Updated upstream
-Виконайте форк цього репозиторію для виконання домашніх завдань (2-6)
-Форк створить репозиторій на вашому http://github.com
-
-Додайте ментора до колаборації
-=======
 This repository contains a RESTful API for managing a collection of contacts. The API is built using Node.js and Express, providing endpoints for performing CRUD operations on the contacts.
 It uses MongoDB as the database for storing contact information. The API follows best practices and includes proper error handling, data validation using the Joi package, and integration with MongoDB using Mongoose. This project also implements user authentication and authorization using JSON Web Tokens (JWT), and user email verification using the SendGrid service. It provides endpoints for user registration, login, token verification middleware, user logout, pagination, and filtration by favorites.
->>>>>>> Stashed changes
+This repository contains a RESTful API for managing a collection of contacts. The API is built using Node.js and Express, providing endpoints for performing CRUD operations on the contacts.
+It uses MongoDB as the database for storing contact information. The API follows best practices and includes proper error handling, data validation using the Joi package, and integration with MongoDB using Mongoose. This project also implements user authentication and authorization using JSON Web Tokens (JWT), and user email verification using the SendGrid service. It provides endpoints for user registration, login, token verification middleware, user logout, pagination, filtration by favorites, and subscription update.
 
-Для кожної домашньої роботи створюйте свою гілку.
+### Endpoints
 
-- hw02
-- hw03
-- hw04
-- hw05
-- hw06
+#### 1. GET /api/contacts
 
-Кожна нова гілка для др повинна робитися з master
+Retrieves contacts from user's collection with pagination support.
 
-Після того, як ви закінчили виконувати домашнє завдання у своїй гілці, необхідно зробити пулл-реквест (PR). Потім додати ментора для рев'ю коду. Тільки після того, як ментор заапрувить PR, ви можете виконати мердж гілки з домашнім завданням у майстер.
+    Does not receive a body or parameters.
+    Requires authentication (token in the Authorization header).
+    Returns a paginated contact list in JSON format with a status code of 200 (OK).
 
-<<<<<<< Updated upstream
-Уважно читайте коментарі ментора. Виправте зауваження та зробіть коміт у гілці з домашнім завданням. Зміни підтягнуться у PR автоматично після того, як ви відправите коміт з виправленнями на github
-Після виправлення знову додайте ментора на рев'ю коду.
-
-- При здачі домашньої роботи є посилання на PR
-- JS-код чистий та зрозумілий, для форматування використовується Prettier
-
-### Команди:
-
-- `npm start` &mdash; старт сервера в режимі production
-- `npm run start:dev` &mdash; старт сервера в режимі розробки (development)
-- `npm run lint` &mdash; запустити виконання перевірки коду з eslint, необхідно виконувати перед кожним PR та виправляти всі помилки лінтера
-- `npm lint:fix` &mdash; та ж перевірка лінтера, але з автоматичними виправленнями простих помилок
-=======
 ##### GET /api/contacts?favorite=true
 
 Retrieves contacts filtered by favorites.
@@ -183,4 +162,3 @@ The API relies on the following dependencies:
 - jimp (image processing)
 - uuid (generating verification tokens)
 - sendgrid/mail (sending verification emails)
->>>>>>> Stashed changes
