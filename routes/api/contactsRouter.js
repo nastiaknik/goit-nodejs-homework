@@ -10,12 +10,12 @@ const {
 } = require("../../controllers/contacts");
 const validateBody = require("../../middlewares/validateBody");
 const isValidId = require("../../middlewares/isValidId");
+const authenticate = require("../../middlewares/authenticate");
 const {
   contactAddSchema,
   contactUpdateSchema,
   contactUpdateFavoriteSchema,
 } = require("../../schemas/contactsSchemas");
-const authenticate = require("../../middlewares/authenticate");
 
 router.use(authenticate);
 

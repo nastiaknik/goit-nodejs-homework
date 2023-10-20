@@ -9,32 +9,27 @@ const userSchema = new Schema(
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
       match: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
       unique: true,
+      required: [true, "Email is required"],
     },
     password: {
       type: String,
       minLength: 6,
       required: [true, "Set password for user"],
     },
-    subscription: {
-      type: String,
-      enum: ["starter", "pro", "business"],
-      default: "starter",
-    },
     token: String,
-    avatarURL: {
+    verificationToken: {
       type: String,
-      required: true,
+      required: [true, "Verify token is required"],
     },
     verify: {
       type: Boolean,
       default: false,
     },
-    verificationToken: {
-      type: String,
-      required: [true, "Verify token is required"],
+    resetToken: {
+      token: String,
+      expiration: Date,
     },
   },
   { versionKey: false, timestamps: true }

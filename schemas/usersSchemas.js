@@ -34,16 +34,16 @@ const loginSchema = Joi.object({
     .messages({ "any.required": "missing required password field" }),
 });
 
-const updateUserSubscriptionSchema = Joi.object({
-  subscription: Joi.string()
-    .valid("starter", "pro", "business")
-    .required()
-    .messages({ "any.required": "missing field subscription" }),
+const passwordRecoverySchema = Joi.object({
+  password: Joi.string().min(6).required().messages({
+    "any.required": "missing required 'password' field",
+    "string.min": "password length must be at least 6 characters long",
+  }),
 });
 
 module.exports = {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
-  updateUserSubscriptionSchema,
+  passwordRecoverySchema,
 };

@@ -1,18 +1,16 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const User = require("../models/user");
 const HttpError = require("../helpers/HttpError");
 const ctrlWrapper = require("../helpers/ctrlWrapper");
-const { SECRET_KEY, BASE_URL } = process.env;
-const gravatar = require("gravatar");
-const fs = require("fs/promises");
-const Jimp = require("jimp");
-const path = require("path");
 const sendEmail = require("../helpers/sendEmail");
 const { v4: uuidv4 } = require("uuid");
+const { SECRET_KEY, FRONTEND_BASE_URL } = process.env;
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
+
   const user = await User.findOne({ email });
   if (user) {
     throw new HttpError(409, "Email already in use");
@@ -20,22 +18,35 @@ const register = async (req, res) => {
 
   const hashPassword = await bcrypt.hash(password, 10);
 
-  const avatarURL = gravatar.url(email, { s: 250, d: "mp", r: "pg" });
-
   const verificationToken = uuidv4();
 
   const newUser = await User.create({
     name,
     email,
     password: hashPassword,
-    avatarURL,
     verificationToken,
   });
 
   const verifyEmail = {
     to: email,
-    subject: "Account Verification",
-    html: `<p>Please verify your account by clicking the link below:</p><p><a target="_blank" href="${BASE_URL}/api/users/verify/${verificationToken}">Click here to verify</a></p>`,
+    subject: "Account Verification for Contact Book App",
+    html: `
+      <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
+    <div style="background-color: #ffffff; max-width: 600px; margin: 0 auto; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 20px;">
+      <h2 style="color: #333; margin-bottom: 20px;">Confirm your email</h2>
+      <p style="color: #333; font-size: 16px; margin-bottom: 15px;">
+        Hi  ${newUser.name},
+      </p>
+      <p style="color: #555; font-size: 16px;">
+        Thank you for choosing Contact Book. To complete your account setup, please verify your email by clicking the link below:
+      </p>
+      <a style="display: inline-block; background-color: #007BFF; color: #fff; text-decoration: none;
+      padding: 10px 20px; border-radius: 5px; margin-top: 20px; font-weight: bold;" target="_blank" href="${FRONTEND_BASE_URL}/auth/verify/${verificationToken}">
+        Verify Your Account
+      </a>
+    </div>
+  </div>
+  `,
   };
 
   await sendEmail(verifyEmail);
@@ -43,8 +54,6 @@ const register = async (req, res) => {
   res.status(201).json({
     name: newUser.name,
     email: newUser.email,
-    subscription: newUser.subscription,
-    avatarURL: newUser.avatarURL,
     verificationToken: newUser.verificationToken,
   });
 };
@@ -75,8 +84,6 @@ const login = async (req, res) => {
     user: {
       name: user.name,
       email: user.email,
-      subscription: user.subscription,
-      avatarURL: user.avatarURL,
     },
   });
 };
@@ -112,60 +119,119 @@ const resentVerifyEmail = async (req, res) => {
 
   const verifyEmail = {
     to: email,
-    subject: "Account Verification",
-    html: `<p>Please verify your account by clicking the link below:</p><p><a target="_blank" href="${BASE_URL}/api/users/verify/${user.verificationToken}">Click here to verify</a></p>`,
+    subject: "Account Verification for Contact Book App",
+    html: `
+          <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
+    <div style="background-color: #ffffff; max-width: 600px; margin: 0 auto; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 20px;">
+      <h2 style="color: #333; margin-bottom: 20px;">Confirm your email</h2>
+      <p style="color: #333; font-size: 16px; margin-bottom: 15px;">
+        Hi  ${user.name},
+      </p>
+      <p style="color: #555; font-size: 16px;">
+        Thank you for choosing Contact Book. To complete your account setup, please verify your email by clicking the link below:
+      </p>
+      <a style="display: inline-block; background-color: #007BFF; color: #fff; text-decoration: none;
+      padding: 10px 20px; border-radius: 5px; margin-top: 20px; font-weight: bold;" target="_blank" href="${FRONTEND_BASE_URL}/auth/verify/${user.verificationToken}">
+        Verify Your Account
+      </a>
+    </div>
+  </div>
+    `,
   };
 
   await sendEmail(verifyEmail);
   res.json({ message: "Verification email sent" });
 };
 
+const sendRecoveryEmail = async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new HttpError(404, "User is not found");
+  }
+
+  const token = crypto.randomBytes(20).toString("hex");
+  const expirationTime = new Date(Date.now() + 3600000); // token is valid for 1 hour
+
+  await User.findByIdAndUpdate(user._id, {
+    resetToken: { token, expiration: expirationTime },
+  });
+
+  const resetEmail = {
+    to: email,
+    subject: "Password Reset for Contact Book App",
+    html: `    
+   <div style="font-family: Arial, sans-serif; background-color: #f4f4f4; text-align: center; padding: 20px;">
+        <div style="background-color: #ffffff; max-width: 600px; margin: 0 auto; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); padding: 20px;">
+          <h2 style="color: #333;">Password Reset</h2>
+          <p style="color: #333; font-size: 16px; margin-bottom: 15px;">
+            Hello ${user.name},
+          </p>
+          <p style="color: #333; font-size: 16px;">
+            You've requested a password reset for your Contact Book App account. To change your password, please click the link below:
+          </p>
+          <a style="display: inline-block; background-color: #007BFF; color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 20px; font-weight: bold;" target="_blank" href="${FRONTEND_BASE_URL}/auth/recovery/${token}">
+            Reset Your Password
+          </a>
+          <p style="color: #555; font-size: 16px; margin-top: 20px;">
+            If you didn't request this password reset, please ignore this email.
+          </p>
+        </div>
+      </div>`,
+  };
+
+  await sendEmail(resetEmail);
+  res.status(200).json({ message: "Recovery email is sent" });
+};
+
+const changeUserPassword = async (req, res) => {
+  const { password } = req.body;
+  const token = req.params.resetToken;
+
+  const user = await User.findOne({ "resetToken.token": token });
+
+  if (!user) {
+    throw new HttpError(404, "User is not found");
+  }
+
+  const savedToken = user.resetToken.token;
+  const tokenExpiration = user.resetToken.expiration;
+
+  if (!savedToken || token !== savedToken || Date.now() >= tokenExpiration) {
+    throw new HttpError(400, "Invalid or expired token");
+  }
+
+  if (token === savedToken && Date.now() <= tokenExpiration) {
+    const hashPassword = await bcrypt.hash(password, 12);
+
+    const updatedUser = await User.findByIdAndUpdate(
+      user._id,
+      {
+        password: hashPassword,
+        resetToken: { token: null, expiration: null },
+      },
+      { new: true }
+    );
+
+    res.status(200).json({
+      message: "Password is successfully changed",
+      user: updatedUser,
+    });
+  }
+};
+
 const getCurrent = async (req, res) => {
   const { email, name } = req.user;
-  res.json({
-    email,
-    name,
-  });
+  res.json({ email, name });
 };
 
 const logout = async (req, res) => {
   const { _id } = req.user;
-  await User.findByIdAndUpdate(_id, { token: "" });
+  await User.findByIdAndUpdate(_id, { token: null });
   res.json({
     message: "Logout success",
   });
-};
-
-const updateUserSubscription = async (req, res) => {
-  const { subscription } = req.body;
-  const user = await User.findById(req.user._id);
-  if (!user) {
-    return new HttpError(401, "Unauthorized");
-  }
-  await User.findByIdAndUpdate(req.user._id, { subscription });
-  res.json({ message: "Subscription updated successfully" });
-};
-
-const updateUserAvatar = async (req, res) => {
-  const { _id: id } = req.user;
-  const user = await User.findById(id);
-  if (!user) {
-    return new HttpError(401, "Unauthorized");
-  }
-
-  const { path: oldPath, originalname } = req.file;
-  const filename = `${id}_${originalname}`;
-  const avatarsPath = path.resolve("public", "avatars");
-  const newPath = path.join(avatarsPath, filename);
-  await fs.rename(oldPath, newPath);
-  const avatarURL = path.join("avatars", filename);
-
-  const image = await Jimp.read(newPath);
-  image.resize(250, 250);
-
-  await User.findByIdAndUpdate(id, { avatarURL }, { new: true });
-  res.json({ message: "Avatar updated successfully" });
-};
 
 module.exports = {
   register: ctrlWrapper(register),
@@ -174,6 +240,6 @@ module.exports = {
   resentVerifyEmail: ctrlWrapper(resentVerifyEmail),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
-  updateUserSubscription: ctrlWrapper(updateUserSubscription),
-  updateUserAvatar: ctrlWrapper(updateUserAvatar),
+  sendRecoveryEmail: ctrlWrapper(sendRecoveryEmail),
+  changeUserPassword: ctrlWrapper(changeUserPassword),
 };

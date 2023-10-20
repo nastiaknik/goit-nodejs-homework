@@ -5,7 +5,7 @@ const {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
-  updateUserSubscriptionSchema,
+  passwordRecoverySchema,
 } = require("../../schemas/usersSchemas");
 const {
   register,
@@ -14,10 +14,10 @@ const {
   resentVerifyEmail,
   getCurrent,
   logout,
-  updateUserSubscription,
-  updateUserAvatar,
+  sendRecoveryEmail,
+  changeUserPassword,
 } = require("../../controllers/auth");
-const upload = require("../../middlewares/upload");
+
 
 const router = express.Router();
 
@@ -33,18 +33,12 @@ router.get("/current", authenticate, getCurrent);
 
 router.post("/logout", authenticate, logout);
 
-router.patch(
-  "/",
-  authenticate,
-  validateBody(updateUserSubscriptionSchema),
-  updateUserSubscription
-);
+router.post("/recovery", validateBody(verifyEmailSchema), sendRecoveryEmail);
 
 router.patch(
-  "/avatars",
-  authenticate,
-  upload.single("avatar"),
-  updateUserAvatar
+  "/recovery/:resetToken",
+  validateBody(passwordRecoverySchema),
+  changeUserPassword
 );
 
 module.exports = router;
