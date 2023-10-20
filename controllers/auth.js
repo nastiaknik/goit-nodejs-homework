@@ -232,6 +232,7 @@ const logout = async (req, res) => {
   res.json({
     message: "Logout success",
   });
+};
 
 module.exports = {
   register: ctrlWrapper(register),
