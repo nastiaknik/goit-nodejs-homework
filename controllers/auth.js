@@ -7,6 +7,7 @@ const ctrlWrapper = require("../helpers/ctrlWrapper");
 const sendEmail = require("../helpers/sendEmail");
 const { v4: uuidv4 } = require("uuid");
 const { SECRET_KEY, FRONTEND_BASE_URL } = process.env;
+const jwt_decode = require("jwt-decode");
 
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -73,10 +74,7 @@ const login = async (req, res) => {
     throw new HttpError(403, "Email is not verified");
   }
 
-  const payload = {
-    id: user._id,
-  };
-  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
+  const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "23h" });
   await User.findByIdAndUpdate(user._id, { token });
 
   res.status(200).json({
@@ -234,6 +232,61 @@ const logout = async (req, res) => {
   });
 };
 
+const googleAuth = async (req, res) => {
+  const { googleToken } = req.body;
+
+  if (!googleToken) {
+    throw new HttpError(400, "Google token is missing");
+  }
+
+  const userObj = jwt_decode(googleToken);
+  const { name, email } = userObj;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    const newUser = await User.create({
+      name,
+      email,
+      verificationToken: null,
+      verify: true,
+    });
+
+    const token = jwt.sign({ id: newUser._id }, SECRET_KEY, {
+      expiresIn: "23h",
+    });
+
+    await User.findByIdAndUpdate(user._id, { token }, { new: true });
+
+    res.status(201).json({
+      user: { name: newUser.name, email: newUser.email },
+      token,
+      message: "Registered with Google successfully",
+    });
+  }
+
+  if (user) {
+    const token = jwt.sign({ id: user._id }, SECRET_KEY, {
+      expiresIn: "23h",
+    });
+
+    await User.findByIdAndUpdate(
+      user._id,
+      { verify: true, verificationToken: null, token },
+      { new: true }
+    );
+
+    res.status(200).json({
+      user: {
+        name: user.name,
+        email: user.email,
+      },
+      token,
+      message: "Logged in with Google successfully",
+    });
+  }
+};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
@@ -243,4 +296,5 @@ module.exports = {
   logout: ctrlWrapper(logout),
   sendRecoveryEmail: ctrlWrapper(sendRecoveryEmail),
   changeUserPassword: ctrlWrapper(changeUserPassword),
+  googleAuth: ctrlWrapper(googleAuth),
 };

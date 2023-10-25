@@ -6,6 +6,7 @@ const {
   loginSchema,
   verifyEmailSchema,
   passwordRecoverySchema,
+  googleTokenSchema,
 } = require("../../schemas/usersSchemas");
 const {
   register,
@@ -16,8 +17,8 @@ const {
   logout,
   sendRecoveryEmail,
   changeUserPassword,
+  googleAuth,
 } = require("../../controllers/auth");
-
 
 const router = express.Router();
 
@@ -40,5 +41,7 @@ router.patch(
   validateBody(passwordRecoverySchema),
   changeUserPassword
 );
+
+router.post("/google", validateBody(googleTokenSchema), googleAuth);
 
 module.exports = router;

@@ -41,9 +41,16 @@ const passwordRecoverySchema = Joi.object({
   }),
 });
 
+const googleTokenSchema = Joi.object({
+  googleToken: Joi.string()
+    .required()
+    .messages({ "any.required": "missing required google token field" }),
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
   passwordRecoverySchema,
+  googleTokenSchema,
 };

@@ -1,9 +1,9 @@
 const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
-require("dotenv").config();
 const contactsRouter = require("./routes/api/contactsRouter");
 const authRouter = require("./routes/api/authRouter");
+require("dotenv").config();
 
 const app = express();
 
@@ -20,7 +20,9 @@ app.use("/api/users", authRouter);
 app.use("/api/contacts", contactsRouter);
 
 app.use((req, res) => {
-  res.status(404).json({ message: "Use api on routes: /api/contacts" });
+  res
+    .status(404)
+    .json({ message: "Use api on routes: /api/contacts or /api/users" });
 });
 
 app.use((err, req, res, next) => {
