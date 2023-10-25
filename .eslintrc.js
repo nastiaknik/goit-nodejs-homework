@@ -10,5 +10,5 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 12,
   },
-  rules: {},
+  rules: { camelcase: "off" },
 };

@@ -16,12 +16,10 @@ const userSchema = new Schema(
     password: {
       type: String,
       minLength: 6,
-      required: [true, "Set password for user"],
     },
     token: String,
     verificationToken: {
       type: String,
-      required: [true, "Verify token is required"],
     },
     verify: {
       type: Boolean,
