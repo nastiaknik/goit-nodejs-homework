@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const HttpError = require("../helpers/HttpError");
-const sendEmail = require("../helpers/sendEmail");
+const { sendVerificationEmail } = require("../helpers/sendEmail");
 const { TEST_DB_HOST } = process.env;
 
 jest.mock("../models/user.js");
@@ -112,6 +112,7 @@ describe("User Auth Controller", () => {
       User.create.mockResolvedValue({
         name: "John Doe",
         email: "johndoe@example.com",
+        _id: "123456",
         verificationToken: expect.any(String),
       });
 
@@ -146,13 +147,16 @@ describe("User Auth Controller", () => {
         password: "hashedPassword",
         verificationToken: expect.any(String),
       });
-    
-      expect(sendEmail).toHaveBeenCalled();
+
+      expect(sendVerificationEmail).toHaveBeenCalled();
 
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
-        name: "John Doe",
-        email: "johndoe@example.com",
+        user: {
+          name: "John Doe",
+          email: "johndoe@example.com",
+          _id: "123456",
+        },
         verificationToken: expect.any(String),
       });
 

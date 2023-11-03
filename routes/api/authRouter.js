@@ -12,11 +12,11 @@ const {
   register,
   login,
   verifyEmail,
-  resentVerifyEmail,
+  resendVerifyEmail,
   getCurrent,
   logout,
-  sendRecoveryEmail,
-  changeUserPassword,
+  recoverPassword,
+  changePassword,
   googleAuth,
 } = require("../../controllers/auth");
 
@@ -28,18 +28,18 @@ router.post("/login", validateBody(loginSchema), login);
 
 router.get("/verify/:verificationToken", verifyEmail);
 
-router.post("/verify", validateBody(verifyEmailSchema), resentVerifyEmail);
+router.post("/verify", validateBody(verifyEmailSchema), resendVerifyEmail);
 
 router.get("/current", authenticate, getCurrent);
 
 router.post("/logout", authenticate, logout);
 
-router.post("/recovery", validateBody(verifyEmailSchema), sendRecoveryEmail);
+router.post("/recovery", validateBody(verifyEmailSchema), recoverPassword);
 
 router.patch(
   "/recovery/:resetToken",
   validateBody(passwordRecoverySchema),
-  changeUserPassword
+  changePassword
 );
 
 router.post("/google", validateBody(googleTokenSchema), googleAuth);
