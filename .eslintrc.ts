@@ -5,10 +5,12 @@ module.exports = {
     node: true,
     "jest/globals": true,
   },
-  plugins: ["jest"],
+  plugins: ["jest", "@typescript-eslint"],
   extends: ["standard", "prettier"],
+  parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: 12,
+    sourceType: "module",
   },
   rules: { camelcase: "off" },
 };

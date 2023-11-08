@@ -1,7 +1,8 @@
-const { Schema, model } = require("mongoose");
-const handleMongooseError = require("../helpers/handleMongooseError");
+import { Schema, model } from "mongoose";
+import handleMongooseError from "../helpers/handleMongooseError";
+import { IUser } from "src/types/User";
 
-const userSchema = new Schema(
+const userSchema = new Schema<IUser>(
   {
     name: {
       type: String,
@@ -25,16 +26,12 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    resetToken: {
-      token: String,
-      expiration: Date,
-    },
   },
   { versionKey: false, timestamps: true }
 );
 
-userSchema.post("save", handleMongooseError);
+userSchema.post<IUser>("save", handleMongooseError);
 
-const User = model("user", userSchema);
+const User = model<IUser>("User", userSchema);
 
-module.exports = User;
+export default User;

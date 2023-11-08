@@ -1,13 +1,14 @@
-const express = require("express");
-const validateBody = require("../../middlewares/validateBody");
-const authenticate = require("../../middlewares/authenticate");
-const {
+import express from "express";
+import { authControllers } from "../controllers/auth";
+import validateBody from "../middlewares/validateBody";
+import authenticate from "../middlewares/authenticate";
+import {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
   passwordRecoverySchema,
   googleTokenSchema,
-} = require("../../schemas/usersSchemas");
+} from "../schemas/usersSchemas";
 const {
   register,
   login,
@@ -18,7 +19,7 @@ const {
   recoverPassword,
   changePassword,
   googleAuth,
-} = require("../../controllers/auth");
+} = authControllers;
 
 const router = express.Router();
 
@@ -44,4 +45,4 @@ router.patch(
 
 router.post("/google", validateBody(googleTokenSchema), googleAuth);
 
-module.exports = router;
+export default router;

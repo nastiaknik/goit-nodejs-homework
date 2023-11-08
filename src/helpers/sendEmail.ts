@@ -1,9 +1,20 @@
-const sgMail = require("@sendgrid/mail");
-const { SENDGRID_API_KEY, FRONTEND_BASE_URL } = process.env;
+import sgMail from "@sendgrid/mail";
+
+const { SENDGRID_API_KEY = "", FRONTEND_BASE_URL = "" } = process.env;
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 
-const sendVerificationEmail = async ({ userName, userEmail, token }) => {
+interface EmailParams {
+  userName: string;
+  userEmail: string;
+  token: string;
+}
+
+const sendVerificationEmail = async ({
+  userName,
+  userEmail,
+  token,
+}: EmailParams): Promise<boolean> => {
   const email = {
     to: userEmail,
     from: "anastazja.knihnitska@gmail.com",
@@ -30,7 +41,11 @@ const sendVerificationEmail = async ({ userName, userEmail, token }) => {
   return true;
 };
 
-const sendRecoveryEmail = async ({ userName, userEmail, token }) => {
+const sendRecoveryEmail = async ({
+  userName,
+  userEmail,
+  token,
+}: EmailParams): Promise<boolean> => {
   const email = {
     from: "anastazja.knihnitska@gmail.com",
     to: userEmail,
@@ -58,4 +73,4 @@ const sendRecoveryEmail = async ({ userName, userEmail, token }) => {
   return true;
 };
 
-module.exports = { sendVerificationEmail, sendRecoveryEmail };
+export { sendVerificationEmail, sendRecoveryEmail };

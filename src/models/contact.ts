@@ -1,7 +1,8 @@
-const { Schema, model } = require("mongoose");
-const handleMongooseError = require("../helpers/handleMongooseError");
+import { Schema, model } from "mongoose";
+import handleMongooseError from "../helpers/handleMongooseError";
+import { IContact } from "src/types/Contact";
 
-const contactSchema = new Schema(
+const contactSchema = new Schema<IContact>(
   {
     name: {
       type: String,
@@ -24,8 +25,8 @@ const contactSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
-contactSchema.post("save", handleMongooseError);
+contactSchema.post<IContact>("save", handleMongooseError);
 
-const Contact = model("contact", contactSchema);
+const Contact = model<IContact>("contact", contactSchema);
 
-module.exports = Contact;
+export default Contact;

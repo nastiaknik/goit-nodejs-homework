@@ -1,11 +1,12 @@
 class HttpError extends Error {
-  constructor(status, message = messages[status] || messages.default) {
+  status: number;
+  constructor(status: number, message = messages[status] || messages.default) {
     super(message);
     this.status = status;
   }
 }
 
-const messages = {
+const messages: Record<number | "default", string> = {
   400: "Bad Request",
   401: "Unauthorized",
   403: "Forbidden",
@@ -14,4 +15,4 @@ const messages = {
   default: "Internal Server Error",
 };
 
-module.exports = HttpError;
+export default HttpError;

@@ -1,4 +1,4 @@
-const Joi = require("joi");
+import Joi from "joi";
 
 const emailRegExp = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
 
@@ -47,10 +47,10 @@ const googleTokenSchema = Joi.object({
     .messages({ "any.required": "missing required google token field" }),
 });
 
-module.exports = {
+export {
   registerSchema,
   loginSchema,
   verifyEmailSchema,
   passwordRecoverySchema,
-  googleTokenSchema,
+  googleTokenSchema
 };
