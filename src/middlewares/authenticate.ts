@@ -5,7 +5,7 @@ import HttpError from "../helpers/HttpError";
 const { SECRET_KEY = "" } = process.env;
 
 interface TokenPayload {
-  _id: string;
+  id: string;
 }
 
 const authenticate = async (req: any, _: Response, next: NextFunction) => {
@@ -15,8 +15,8 @@ const authenticate = async (req: any, _: Response, next: NextFunction) => {
     return next(new HttpError(401, "Invalid or missing token"));
   }
   try {
-    const { _id } = jwt.verify(token, SECRET_KEY as string) as TokenPayload;
-    const user = await User.findById(_id);
+    const { id } = jwt.verify(token, SECRET_KEY as string) as TokenPayload;
+    const user = await User.findById(id);
     if (!user || !user.token || user.token !== token) {
       return next(new HttpError(401, "Invalid user or token mismatch"));
     }
