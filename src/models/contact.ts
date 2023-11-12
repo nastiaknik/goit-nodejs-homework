@@ -19,7 +19,7 @@ const contactSchema = new Schema<IContact>(
     },
     owner: {
       type: Schema.Types.ObjectId,
-      ref: "user",
+      ref: "User",
     },
   },
   { versionKey: false, timestamps: true }
