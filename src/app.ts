@@ -17,7 +17,7 @@ app.use(express.static("public"));
 app.use("/api/users", authRouter);
 app.use("/api/contacts", contactsRouter);
 
-app.use((_req: any, res: Response) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({
     status: "error",
     code: 404,

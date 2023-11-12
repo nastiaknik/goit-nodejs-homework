@@ -1,8 +1,8 @@
-import app from "./app";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
-
+import * as dotenv from "dotenv";
 dotenv.config();
+import app from "./app";
+
 mongoose.set("strictQuery", true);
 
 const { DB_HOST = "", PORT = 3001 } = process.env;
