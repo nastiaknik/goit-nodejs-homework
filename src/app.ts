@@ -3,11 +3,14 @@ import logger from "morgan";
 import cors from "cors";
 import contactsRouter from "./routes/contactsRouter.js";
 import authRouter from "./routes/authRouter";
+import swaggerUi from "swagger-ui-express";
+import swaggerDoc from "./swagger.json";
 
 const app: Application = express();
 const formatsLogger: string =
   app.get("env") === "development" ? "dev" : "short";
 
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());

@@ -1,0 +1,966 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "version": "1.0.1",
+    "title": "Contact Book",
+    "description": "A Contact Book application, which allows users to register, login, and manage their private collection of contacts."
+  },
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "servers": [
+    {
+      "url": "https://goit-nodejs-homework-bnfs.onrender.com"
+    },
+    {
+      "url": "http://localhost:3001"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authorization endpoints"
+    },
+    { "name": "Contacts", "description": "Contact endpoints" }
+  ],
+  "paths": {
+    "/api/users/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User registration",
+        "parameters": [],
+        "requestBody": {
+          "description": "Registration object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User with this email is already in the base",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/verify/:verificationToken": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "User email verification",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "verificationToken",
+            "required": true,
+            "type": "string",
+            "description": "User's email verification code",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User is not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/verify": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User verification email resend",
+        "parameters": [],
+        "requestBody": {
+          "description": "User email resend object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailVerificationResendRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User is not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User login",
+        "parameters": [],
+        "requestBody": {
+          "description": "User login object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access errors (authorization or email verification)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User logout",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access errors (authorization or token verification)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/recovery": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User recovery email send",
+        "parameters": [],
+        "requestBody": {
+          "description": "User recovery email object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailVerificationResendRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User is not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/recovery/:resetToken": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "User password change",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "resetToken",
+            "required": true,
+            "type": "string",
+            "description": "User's reset code"
+          }
+        ],
+        "requestBody": {
+          "description": "User password object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChangeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "User is not found or recoveryId is unvalid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "api/users/google": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Authenticate with Google",
+        "parameters": [],
+        "requestBody": {
+          "description": "User Google authentication object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleAuthRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful authenticated with Google",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GoogleResponse"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Successfully authenticated with Google",
+            "schema": {
+              "$ref": "#/components/schemas/GoogleResponse"
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts": {
+      "get": {
+        "tags": ["Contacts"],
+        "summary": "Get all contacts ",
+        "security": [{ "Bearer": [] }],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (invalid access token)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Contact is not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Contacts"],
+        "summary": "Add contact",
+        "security": [{ "Bearer": [] }],
+        "parameters": [],
+        "requestBody": {
+          "description": "Contact's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactResponse"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (invalid access token)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts/:id": {
+      "patch": {
+        "tags": ["Contacts"],
+        "summary": "Update contact",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "Contact's id ('id' field in contact object)",
+            "example": "650c3f946c21727c39401444"
+          }
+        ],
+        "requestBody": {
+          "description": "Contact's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactResponse"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (invalid access token)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Contact is not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Contacts"],
+        "summary": "Delete contact",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "Contact's id ('id' field in contact object)",
+            "example": "650c3f946c21727c39401444"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Contact deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (invalid access token)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Contact is not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/contacts/:id/favorite": {
+      "patch": {
+        "tags": ["Contacts"],
+        "summary": "Update contact favorite status",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "string",
+            "description": "Contact's id ('id' field in contact object)",
+            "example": "6438255d9ef48a24e5d81693"
+          }
+        ],
+        "requestBody": {
+          "description": "Contact favorite status",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactFavoriteStatus"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized (invalid access token)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Contcat is not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RegistrationRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "example": "John Dou"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "pattern": "/^w+([.-]?w+)*@w+([.-]?w+)*(.w{2,3})+$/",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "minLength": 6,
+            "example": "qwerty123"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "pattern": "/^w+([.-]?w+)*@w+([.-]?w+)*(.w{2,3})+$/",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "minLength": 6,
+            "example": "qwerty123"
+          }
+        }
+      },
+      "EmailVerificationResendRequest": {
+        "type": "object",
+        "required": ["email"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "pattern": "/^w+([.-]?w+)*@w+([.-]?w+)*(.w{2,3})+$/",
+            "format": "email"
+          }
+        }
+      },
+      "PasswordChangeRequest": {
+        "type": "object",
+        "required": ["password", "token"],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "User's reset token",
+            "example": "755281f50d04e25628bf5785d51cf76203b81bb0"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "minLength": 6,
+            "example": "qwerty123"
+          }
+        }
+      },
+      "GoogleAuthRequest": {
+        "type": "object",
+        "required": ["googleToken"],
+        "properties": {
+          "googleToken": {
+            "type": "string",
+            "description": "Google token"
+          }
+        }
+      },
+      "GoogleResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "John Dou"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "_id": {
+                "type": "string",
+                "description": "User's id",
+                "example": "64975ec51ef898762c594f14"
+              }
+            }
+          },
+          "token": {
+            "type": "string",
+            "description": "Access token"
+          },
+          "message": {
+            "type": "string",
+            "description": "Response message",
+            "example": "Registered with Google successfully"
+          }
+        }
+      },
+      "RegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "John Dou"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "_id": {
+                "type": "string",
+                "description": "User's id",
+                "example": "64975ec51ef898762c594f14"
+              }
+            }
+          },
+          "verificationToken": {
+            "type": "string",
+            "description": "Backend verification token"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "User's name",
+                "example": "John Dou"
+              },
+              "email": {
+                "type": "string",
+                "description": "User's email",
+                "format": "email"
+              },
+              "_id": {
+                "type": "string",
+                "description": "User's id",
+                "example": "64975ec51ef898762c594f14"
+              }
+            }
+          },
+          "token": {
+            "type": "string",
+            "description": "Backend access token"
+          }
+        }
+      },
+      "SuccessMessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Success notification",
+            "example": "Here is success message"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Error description",
+            "example": "Here is an error description"
+          }
+        }
+      },
+      "ContactListResponse": {
+        "type": "array",
+        "description": "Array of user's contact list",
+        "items": {
+          "type": "object",
+          "required": ["name", "phone", "favorite", "_id"],
+          "properties": {
+            "_id": {
+              "type": "string",
+              "example": "642fdf8745bc73b2aecbae7b",
+              "description": "Contact's id"
+            },
+            "name": {
+              "type": "string",
+              "description": "Contact's name",
+              "example": "Katie"
+            },
+            "phone": {
+              "type": "string",
+              "description": "Contact's phone",
+              "format": "tel",
+              "example": "+380112233456"
+            },
+            "favorite": {
+              "type": "boolean",
+              "default": "false",
+              "description": "Contact's favorite status"
+            },
+            "owner": {
+              "type": "string",
+              "example": "642fdf8745bc73b2aecbae7b",
+              "description": "Owner's unique identifier."
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2023-04-12T07:28:49.493Z",
+              "description": "Date and time of contact creating"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2023-04-12T07:28:49.493Z",
+              "description": "Date and time of contact updating"
+            }
+          }
+        }
+      },
+      "ContactResponse": {
+        "type": "object",
+        "required": ["name", "phone", "favorite", "owner", "_id"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Contact's name",
+            "example": "Anni"
+          },
+          "phone": {
+            "type": "string",
+            "format": "tel",
+            "description": "Contact's phone number",
+            "pattern": "/^(+?d{1,3}[- ]?)?d{10}$/",
+            "example": "+380112233456"
+          },
+          "favorite": {
+            "type": "boolean",
+            "description": "Contact's favorite status",
+            "default": "false"
+          },
+          "_id": {
+            "type": "string",
+            "description": "Contact's id",
+            "example": "64975ec51ef898762c594f14"
+          },
+          "owner": {
+            "type": "string",
+            "example": "642fdf8745bc73b2aecbae7b",
+            "description": "Owner's unique identifier."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-04-12T07:28:49.493Z",
+            "description": "Date and time of contact creating"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-04-12T07:28:49.493Z",
+            "description": "Date and time of contact updating"
+          }
+        }
+      },
+      "ContactFavoriteStatus": {
+        "type": "object",
+        "required": ["favorite"],
+        "properties": {
+          "favorite": {
+            "type": "boolean",
+            "default": "false",
+            "description": "Contact favorite status"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "BearerFormat": "JWT"
+      }
+    }
+  }
+}
