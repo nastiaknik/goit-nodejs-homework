@@ -1,6 +1,10 @@
 import sgMail from "@sendgrid/mail";
 
-const { SENDGRID_API_KEY = "", FRONTEND_BASE_URL = "" } = process.env;
+const {
+  SENDGRID_API_KEY = "",
+  FRONTEND_BASE_URL = "",
+  BASE_URL = "",
+} = process.env;
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -30,7 +34,7 @@ const sendVerificationEmail = async ({
         Thank you for choosing Contact Book. To complete your account setup, please verify your email by clicking the link below:
       </p>
       <a style="display: inline-block; background-color: #007BFF; color: #fff; text-decoration: none;
-      padding: 10px 20px; border-radius: 5px; margin-top: 20px; font-weight: bold;" target="_blank" href="${FRONTEND_BASE_URL}/auth/verify/${token}">
+      padding: 10px 20px; border-radius: 5px; margin-top: 20px; font-weight: bold;" target="_blank" href="${BASE_URL}/users/verify/${token}">
         Verify Your Account
       </a>
     </div>

@@ -10,7 +10,7 @@ import ctrlWrapper from "../helpers/ctrlWrapper";
 import { sendVerificationEmail, sendRecoveryEmail } from "../helpers/sendEmail";
 import { IUser } from "../types/User";
 
-const { SECRET_KEY = "" } = process.env;
+const { SECRET_KEY = "", FRONTEND_BASE_URL } = process.env;
 
 interface RequestBody {
   name: string;
@@ -87,19 +87,33 @@ const login = async (req: Request, res: Response): Promise<void> => {
 const verifyEmail = async (req: Request, res: Response): Promise<void> => {
   const verificationToken: string = req.params.verificationToken;
   const user: IUser | null = await User.findOne({ verificationToken });
-  if (!user) {
-    throw new HttpError(404, "User not found");
+  if (!SECRET_KEY) {
+    throw new HttpError(
+      500,
+      "Internal Server Error: SECRET KEY is not defined"
+    );
   }
 
-  await User.findByIdAndUpdate(
-    user._id,
-    {
-      verify: true,
-      verificationToken: null,
-    },
-    { new: true }
-  );
-  res.json({ message: "Verification successful" });
+  if (user) {
+    const token: string = jwt.sign({ id: user._id }, SECRET_KEY, {
+      expiresIn: "23h",
+    });
+
+    await User.findByIdAndUpdate(
+      user._id,
+      {
+        verify: true,
+        verificationToken: null,
+        token,
+      },
+      { new: true }
+    );
+    res.status(200).redirect(`${FRONTEND_BASE_URL}/auth/login?token=${token}`);
+  } else {
+    res
+      .status(404)
+      .redirect(`${FRONTEND_BASE_URL}/auth/login?message=verification_failed`);
+  }
 };
 
 const resendVerifyEmail = async (
