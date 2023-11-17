@@ -1,164 +1,131 @@
-# REST API for Contact Collection
+# Contact Book Backend
 
-This repository contains a RESTful API for managing a collection of contacts. The API is built using Node.js and Express, providing endpoints for performing CRUD operations on the contacts.
-It uses MongoDB as the database for storing contact information. The API follows best practices and includes proper error handling, data validation using the Joi package, and integration with MongoDB using Mongoose. This project also implements user authentication and authorization using JSON Web Tokens (JWT), and user email verification using the SendGrid service. It provides endpoints for user registration, login, token verification middleware, user logout, pagination, and filtration by favorites.
-This repository contains a RESTful API for managing a collection of contacts. The API is built using Node.js and Express, providing endpoints for performing CRUD operations on the contacts.
-It uses MongoDB as the database for storing contact information. The API follows best practices and includes proper error handling, data validation using the Joi package, and integration with MongoDB using Mongoose. This project also implements user authentication and authorization using JSON Web Tokens (JWT), and user email verification using the SendGrid service. It provides endpoints for user registration, login, token verification middleware, user logout, pagination, filtration by favorites, and subscription update.
+This project is a Node.js/Express backend application for the [Contact Book](https://contact-book-app-frontend.vercel.app/) web-application.
 
-### Endpoints
+This project implements user authentication and authorization using JSON Web Tokens (JWT), and user email verification using the SendGrid service, password recovery, and Google authentication.
+Users can seamlessly log in with Google, recover forgotten passwords, and manage their contact list by adding, editing, deleting contacts, and marking favorites.
 
-#### 1. GET /api/contacts
+## Table of Contents
 
-Retrieves contacts from user's collection with pagination support.
+- [Swagger Documentation](https://goit-nodejs-homework-bnfs.onrender.com/docs/)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Technology stack](#technology-stack)
+- [Endpoints](#endpoints)
+- [Contributing](#contributing)
 
-    Does not receive a body or parameters.
-    Requires authentication (token in the Authorization header).
-    Returns a paginated contact list in JSON format with a status code of 200 (OK).
+## Swagger Docs
 
-##### GET /api/contacts?favorite=true
+OpenAPI specification is available at /docs endpoint. It provides detailed information about the available API endpoints, request formats, and response formats.
 
-Retrieves contacts filtered by favorites.
-Query parameter: favorite=true
+```javascript
+"https://goit-nodejs-homework-bnfs.onrender.com/docs/";
+```
 
-#### 2. GET /api/contacts/:id
+![Swagger](./src/assets/swagger.png)
 
-Retrieves a specific contact by its ID.
+## Base URL
 
-    Does not receive a body.
-    Receives the parameter id.
-    If the specified id exists, returns the contact object in JSON format with a status code of 200 (OK).
-    If the specified id does not exist, returns JSON with the key "message" set to "Not found" and a status code of 404.
+The backend part of the web-app is located at render.com web service.
 
-#### 3. POST /api/contacts
+```javascript
+BASE_URL = "https://goit-nodejs-homework-bnfs.onrender.com";
+```
 
-Adds a new contact to the collection.
+## Installation
 
-    Receives the body in the format {name, email, phone} where all fields are required.
-    If any of the required fields are missing in the body, it returns JSON with the key {"message": "missing required name field"} and a status code of 400 (Bad Request).
-    If all required fields are present in the body, it adds a unique identifier to the contact object.
-    Returns an object with the added id {id, name, email, phone} and a status code of 201 (Created).
+To run this project locally, follow these steps:
 
-#### 4. DELETE /api/contacts/:id
+1.  Clone the repository:
 
-Deletes a contact from the collection.
+```bash
+  git clone  https://github.com/nastiaknik/goit-nodejs-homework.git
+```
 
-    Does not receive a body.
-    Receives the parameter id.
-    If the specified id exists, returns JSON in the format {"message": "contact deleted"} with a status code of 200 (OK).
-    If the specified id does not exist, returns JSON with the key {"message": "Not found"} and a status code of 404.
+2.  Install dependencies:
 
-#### 5. PUT /api/contacts/:id
+```bash
+  npm install
+```
 
-Updates a contact's information.
+3.  Start the development server:
 
-    Receives the parameter id.
-    Receives the body in JSON format with updates for any of the fields name, email, or phone.
-    If the body is missing, it returns JSON with the key {"message": "missing fields"} and a status code of 400 (Bad Request).
-    Returns the updated contact object and a status code of 200 (OK) if the operation is successful, or JSON with the key {"message": "Not found"} and a status code of 404 if the specified id is not found.
+```bash
+  npm start
+```
 
-#### 6. PATCH /api/contacts/:id/favorite
+This will start the application and you can view it in your browser at http://localhost:3000.
 
-Updates the favorite status of a contact.
+## Usage
 
-    Receives the parameter id.
-    Receives the body in JSON format with the update for the favorite field.
-    If the body is missing, it returns JSON with the key {"message": "missing field favorite"} and a status code of 400 (Bad Request).
-    Returns the updated contact object and a status code of 200 (OK) if the operation is successful, or JSON with the key {"message": "Not found"} and a status code of 404 if the specified id is not found.
+Once the application is running, you can access the API endpoints using a tool like Postman or by integrating with a front-end application.
 
-#### 7. POST /api/users/register
+## Configuration
 
-Registers a new user.
+The application uses environment variables for configuration.
+Create a .env file in the root directory with the following variables:
 
-    Receives the body in the format {name, email, password} where all fields are required.
-    If any of the required fields are missing in the body, it returns JSON with the key {"message": "missing required {field} field"} and a status code of 400 (Bad Request).
-    If the provided email is already in use, it throws an error with a status code of 409 (Conflict) and the message "Email already in use".
-    If all required fields are present in the body and the email is not already in use, it hashes the password using bcrypt, generates a verification token using uuid, and creates a new user with the provided name, email, hashed password, and a verification token.
-    If the user is successfully created and the verification email is sent, the API will return an object in the response with the following properties: name, email, and verificationToken, and a status code of 201 (Created).
-    The API will send a verification email to the provided email address containing a link to verify the user's email.
+```bash
+DB_HOST=mongodb://your-mongodb-host:your-mongodb-port/your-database-name
+SENDGRID_API_KEY=your-sendgrid-api-key
+SECRET_KEY=your-secret-key
+FRONTEND_BASE_URL=your-frontend-base-url
+BASE_URL=your-backend-base-url
+PORT=3001
+GOOGLE_ID=your-google-id
+GOOGLE_SECRET=your-google-secret-key
+```
 
-#### 8. POST /api/users/login
-
-Logs in a user with the provided email and password.
-
-    Receives the body in the format {email, password} where both fields are required.
-    If the provided email or password is incorrect, it throws an error with a status code of 401 (Unauthorized) and the message "Email or password is incorrect".
-     If the user's email is not verified yet, it throws an error with a status code of 403 (Forbidden) and the message "Email is not verified".
-    If the email and password are correct, it generates a JWT (JSON Web Token) using the user's ID as the payload and signs it with a secret key. The generated token has an expiration time of 23 hours.
-    The generated token is then stored in the user's record in the database by updating the corresponding user document with the new token.
-    Returns the generated token in the response body with a status code of 200 (OK).
-    Additionally, the response will include the user's information such as name, and email.
-
-#### 9. POST /api/users/logout
-
-Logs out the currently logged-in user.
-
-    Requires authentication (token in the Authorization header).
-    Clears the token field of the user's record in the database by updating the corresponding user document.
-    Returns a JSON response with a message indicating the successful logout, with a status code of 200 (OK).
-
-#### 10. GET /api/users/current
-
-Retrieves the information of the currently logged-in user.
-
-    Requires authentication (token in the Authorization header).
-    Returns the email and name of the currently logged-in user in JSON format with a status code of 200 (OK).
-    If the user is not found, it returns an error with a status code of 401 (Unauthorized).
-
-#### 11. GET /api/users/verify/:verificationToken
-
-Verifies a user's email using the verification token.
-
-    Received the verification token in the URL parameter.
-    If a user with the provided verification token is found, the API updates the user's record in the database to mark the email as verified. The verification token will be set to null.
-    Returns a message "Verification successful" with a status code of 200 (OK).
-
-#### 12. POST /api/users/verify
-
-Resends the verification email to a user's email address.
-
-    Receives the required field email in the body.
-    If a user with the email is found, and the user's email was already verified it throws an error with a message "Verification has already been passed" and a status code of 400 (Bad Request).
-    If a user with the email is found, and the user's email was not verified the API will send a verification email to the provided email address.
-    The verification email will contain a link for the user to click and verify their email. The link will include the verification token as a parameter.
-    The API will return a JSON response with a message "Verification email sent" with a status code of 200 (OK).
-
-### Validation
-
-To ensure data integrity, the API performs validation on the incoming data using the Joi and Mongoose schema for models.
-
-For adding a new contact:
-
-    All fields (name, email, phone) are required.
-    The email field must match the regular expression to ensure it is a valid email format.
-
-For updating a contact:
-
-    At least one field (name, email, phone) must be provided.
-    If the data fails validation, JSON with the key {"message": "value must contain at least one of [name, email, phone]"} will be returned.
-
-For user registration:
-
-    All fields (name, email, phone) are required.
-    The email must match the email regular expression.
-    The password must have a minimum length of 6 characters.
-
-For user login:
-
-    The email field is required and must match the email regular expression.
-    The password field is required and must have a minimum length of 6 characters.
-
-## Dependencies
-
-The API relies on the following dependencies:
+## Technology stack
 
 - Node.js (runtime environment)
-- Express.js (web framework)
+- Express (web framework)
 - MongoDB (database)
-- Mongoose (MongoDB object modeling)
+- TypeScript (static typing)
 - Joi (data validation)
 - bcrypt.js (password hashing)
-- jsonwebtoken (JWT generation and verification)
-- multer (file upload handling)
-- jimp (image processing)
+- jsonwebtoken (token-based authentication)
 - uuid (generating verification tokens)
-- sendgrid/mail (sending verification emails)
+- sendgrid/mail (sending emails)
+- OAuth 2.0 (Google's authentication service)
+- Swagger (documentation)
+- Render (deployment)
+
+<code><img height="50" src="https://img.icons8.com/color/48/000000/nodejs.png" alt="nodejs" title="NodeJS" /></code>
+<code><img height="50" src="https://user-images.githubusercontent.com/25181517/183859966-a3462d8d-1bc7-4880-b353-e2cbed900ed6.png" alt="express" title="Express" /></code>
+<code><img height="50" src="https://user-images.githubusercontent.com/25181517/182884177-d48a8579-2cd0-447a-b9a6-ffc7cb02560e.png" alt="mongoDB" title="mongoDB" /></code>
+<code><img height="50" src="https://raw.githubusercontent.com/gilbarbara/logos/master/logos/typescript-icon.svg"/></code>
+<code><img height="50" src="https://avatars.githubusercontent.com/u/181234?s=200&v=4" alt="SendGrid" title="SendGrid" /></code>
+<code><img height="50" src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Oauth 2" title="Oauth 2" /></code>
+<code><img height="50" src="https://user-images.githubusercontent.com/25181517/186711335-a3729606-5a78-4496-9a36-06efcc74f800.png" alt="swagger" title="Swagger" /></code>
+
+## Endpoints
+
+The API provides the following endpoints:
+
+### Authentication endpoints
+
+    POST /api/users/register: Register a new user.
+    POST /api/users/login: Login with an existing user.
+    GET /api/users/verify/:verificationToken: Verify user email.
+    POST /api/users/verify: Resend verification email.
+    GET /api/users/current: Get current user details.
+    POST /api/users/logout: Logout the current user.
+    POST /api/users/recovery: Initiate password recovery.
+    PATCH /api/users/recovery/:resetToken: Change password.
+    POST /api/users/google: Authenticate with Google.
+
+### Contact endpoints
+
+    GET /api/contacts: Get all contacts for the current user.
+    POST /api/contacts: Add a new contact.
+    PUT /api/contacts/:id: Update a contact.
+    DELETE /api/contacts/:id: Delete a contact.
+    PATCH /api/contacts/:id/favorite: Update contact favorite status.
+
+For detailed request and response formats, refer to the [Swagger documentation](https://goit-nodejs-homework-bnfs.onrender.com/docs/)
+
+## Contributing
+
+Contributions are welcome! If you have any suggestions, bug reports, or feature requests, please open an issue or create a pull request.
