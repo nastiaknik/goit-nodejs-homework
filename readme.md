@@ -30,7 +30,7 @@ OpenAPI specification is available at /docs endpoint. It provides detailed infor
 The backend part of the web-app is located at render.com web service.
 
 ```javascript
-BASE_URL = "https://goit-nodejs-homework-bnfs.onrender.com";
+BASE_URL = "https://goit-nodejs-homework-bnfs.onrender.com/api";
 ```
 
 ## Installation
@@ -55,7 +55,7 @@ To run this project locally, follow these steps:
   npm start
 ```
 
-This will start the application and you can view it in your browser at http://localhost:3000.
+This will start the application and you can view it in your browser at http://localhost:3001.
 
 ## Usage
 
@@ -88,7 +88,6 @@ GOOGLE_SECRET=your-google-secret-key
 - jsonwebtoken (token-based authentication)
 - uuid (generating verification tokens)
 - sendgrid/mail (sending emails)
-- OAuth 2.0 (Google's authentication service)
 - Swagger (documentation)
 - Render (deployment)
 
@@ -97,7 +96,6 @@ GOOGLE_SECRET=your-google-secret-key
 <code><img height="50" src="https://user-images.githubusercontent.com/25181517/182884177-d48a8579-2cd0-447a-b9a6-ffc7cb02560e.png" alt="mongoDB" title="mongoDB" /></code>
 <code><img height="50" src="https://raw.githubusercontent.com/gilbarbara/logos/master/logos/typescript-icon.svg"/></code>
 <code><img height="50" src="https://avatars.githubusercontent.com/u/181234?s=200&v=4" alt="SendGrid" title="SendGrid" /></code>
-<code><img height="50" src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Oauth 2" title="Oauth 2" /></code>
 <code><img height="50" src="https://user-images.githubusercontent.com/25181517/186711335-a3729606-5a78-4496-9a36-06efcc74f800.png" alt="swagger" title="Swagger" /></code>
 
 ## Endpoints

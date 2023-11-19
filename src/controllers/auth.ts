@@ -58,7 +58,7 @@ const login = async (req: Request, res: Response): Promise<void> => {
     throw new HttpError(401, "Email or password is incorrect");
   }
   if (user.password) {
-    const passwordCompare = bcrypt.compare(password, user.password);
+    const passwordCompare = await bcrypt.compare(password, user.password);
     if (!passwordCompare) {
       throw new HttpError(401, "Email or password is incorrect");
     }
@@ -150,13 +150,21 @@ const recoverPassword = async (req: Request, res: Response): Promise<void> => {
   const token: string = crypto.randomBytes(20).toString("hex");
   const expirationTime: Date = new Date(Date.now() + 3600000);
 
-  await User.findByIdAndUpdate(user._id, {
-    resetToken: { token, expiration: expirationTime },
-  });
+  const updatedUser: IUser | null = await User.findByIdAndUpdate(
+    user._id,
+    {
+      resetToken: { token, expiration: expirationTime },
+    },
+    { new: true }
+  );
+
+  if (!updatedUser) {
+    throw new HttpError(404, "Reset token is not assigned");
+  }
 
   await sendRecoveryEmail({
-    userName: user.name,
-    userEmail: user.email,
+    userName: updatedUser.name,
+    userEmail: updatedUser.email,
     token,
   });
 
